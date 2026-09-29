@@ -27,6 +27,18 @@ class Settings(BaseSettings):
     JWT_SECRET: str
     JWT_EXPIRES_IN: int = 60  # token lifetime in minutes
 
+    # ── MinIO (S3-compatible Object Storage) ────────────────────────────────
+    MINIO_ENDPOINT: str = "localhost"
+    MINIO_PORT: int = 9000
+    MINIO_USE_SSL: bool = False
+    MINIO_ACCESS_KEY: str = "minioadmin"
+    MINIO_SECRET_KEY: str = "minioadmin"
+    MINIO_BUCKET: str = "nexusbase-documents"
+
+    # ── Redis (Celery broker + result backend) ──────────────────────────────
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

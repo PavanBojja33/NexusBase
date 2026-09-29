@@ -96,3 +96,29 @@ async def create_user(user_doc: dict) -> str:
     """
     result = await _collection().insert_one(user_doc)
     return str(result.inserted_id)
+
+
+async def add_knowledge_space_to_user(user_id: str, space_id: str) -> bool:
+    """Push a Knowledge Space ID into a user's `knowledge_spaces` list.
+
+    Uses MongoDB's `$addToSet` operator to guarantee idempotency (prevents
+    duplicate space assignments).
+
+    Args:
+        user_id: The string ObjectId of the user.
+        space_id: The string ObjectId of the Knowledge Space.
+
+    Returns:
+        True if the user was found and updated, False if invalid ID or not found.
+    """
+    try:
+        oid = ObjectId(user_id)
+    except InvalidId:
+        return False
+
+    result = await _collection().update_one(
+        {"_id": oid},
+        {"$addToSet": {"knowledge_spaces": space_id}},
+    )
+    return result.matched_count > 0
+

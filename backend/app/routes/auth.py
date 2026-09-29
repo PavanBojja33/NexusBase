@@ -24,6 +24,7 @@ from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, EmailStr, Field
 
 from app.dependencies.auth import get_current_user
+from app.dependencies.rbac import require_role
 from app.models.user import UserCreate, UserOut
 from app.services import auth_service
 
@@ -65,17 +66,14 @@ class TokenResponse(BaseModel):
         "in the response.\n\n"
         "**Duplicate email** → 409 Conflict.\n\n"
         "---\n"
-        # ⚠️  MODULE 3 TODO — RBAC lock-down ⚠️
-        # This endpoint is intentionally OPEN in Module 2.
-        # In Module 3 (RBAC), restrict this route so that only a
-        # `super_admin` JWT can call it.  For now, anyone can self-register,
-        # which is acceptable for the initial development phase but MUST be
-        # changed before the system is considered production-ready.
-        "**⚠ Note (Module 3):** This endpoint will be restricted to "
-        "`super_admin` role once RBAC is implemented."
+        "**RBAC Notice:** Restricted to `super_admin` role only. Public "
+        "self-registration is disabled."
     ),
 )
-async def register(payload: UserCreate) -> UserOut:
+async def register(
+    payload: UserCreate,
+    _: UserOut = Depends(require_role("super_admin")),
+) -> UserOut:
     """Register a new user and return their profile.
 
     Args:

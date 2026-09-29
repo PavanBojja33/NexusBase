@@ -24,7 +24,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.exceptions import ApiError, api_error_handler
 from app.db.mongo import lifespan
-from app.routes import auth as auth_router
+from app.routes import auth as auth_router, spaces as spaces_router, documents as documents_router
 
 # ── Application instance ───────────────────────────────────────────────────────
 
@@ -60,6 +60,8 @@ app.add_exception_handler(ApiError, api_error_handler)
 # ── Routers ────────────────────────────────────────────────────────────────────
 
 app.include_router(auth_router.router, prefix="/api/v1")
+app.include_router(spaces_router.router, prefix="/api/v1")
+app.include_router(documents_router.router, prefix="/api/v1")
 
 # ── Health check ───────────────────────────────────────────────────────────────
 
